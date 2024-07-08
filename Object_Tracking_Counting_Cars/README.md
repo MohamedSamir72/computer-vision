@@ -1,10 +1,8 @@
-Certainly! Here's a content template for your `readme.md` file based on the provided code:
-
 ---
 
-# Vehicle Detection Using OpenCV
+# Vehicle Tracking and Counting Using OpenCV
 
-This project demonstrates vehicle detection in a video using Python and OpenCV. The script processes each frame of a video, applies background subtraction, and identifies vehicles based on contours.
+This project demonstrates vehicle tracking and counting in a video using Python and OpenCV. The script processes each frame of a video, applies background subtraction, and identifies vehicles based on contours.
 
 ## Prerequisites
 
@@ -51,15 +49,6 @@ python vehicle_detection.py
 
 - Uncomment additional `cv2.imshow()` statements (`ROI`, `Mask`, `Dilation`, `Open`) for detailed debugging and visualization.
 
-## Author
-
-- [Your Name](https://github.com/your_username)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 ### Notes:
 
