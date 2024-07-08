@@ -30,7 +30,7 @@ This project demonstrates vehicle tracking and counting in a video using Python 
 Replace `"video.mp4"` with your video file path in the script (`video.mp4` should be located in the same directory as the script).
 
 ```python
-python vehicle_detection.py
+python Object_Tracking_OpenCV.py
 ```
 
 ### Key Components
