@@ -1,5 +1,3 @@
-Certainly! Below is a sample README.md file that explains the usage and details of your object detection and car counting script using YOLOv8 and OpenCV:
-
 ---
 
 # Object Detection and Car Counting
@@ -9,28 +7,31 @@ This script performs real-time object detection using YOLOv8 and counts cars ent
 ## Requirements
 
 - Python 3.x
-- OpenCV (`pip install opencv-python`)
-- Ultralytics (`pip install ultralytics`)
+- OpenCV 
+- Ultralytics 
 
 ## Installation
 
 1. Install dependencies:
 
    ```bash
-   pip install opencv-python ultralytics
+   pip install opencv-python
+   pip install ultralytics
    ```
 
 ## Usage
 
-1. Place your video file (`video.mp4`) in the same directory as the script.
+1. Place your video file (`video.mp4`) in the same directory as the script. [video](https://drive.google.com/file/d/1nIT_Aun0yGq38zOCC6SKdPanyl0TI2hH/view?usp=sharing)
 
-2. Run the script:
+2. Get the weights of YOLO model. [yolov8n.pt](https://drive.google.com/file/d/1huGZnAoj0rEBolhNv-59s-ZBshLxxRcM/view?usp=sharing)
+
+3. Run the script:
 
    ```bash
    python object_detection_car_counting.py
    ```
 
-3. To quit the application, press `q` while the window displaying the video is active.
+4. To quit the application, press `q` while the window displaying the video is active.
 
 ## Functionality
 
