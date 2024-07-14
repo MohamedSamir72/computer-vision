@@ -12,13 +12,7 @@ This project demonstrates vehicle tracking and counting in a video using Python 
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone <repository_url>
-   cd <repository_directory>
-   ```
-
-2. Install dependencies:
+1. Install dependencies:
    ```bash
    pip install numpy opencv-python
    ```
