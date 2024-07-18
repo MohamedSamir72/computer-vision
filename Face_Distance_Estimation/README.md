@@ -7,7 +7,6 @@ This project combines MediaPipe's FaceMesh for facial landmark detection and the
 - Python 3.x
 - OpenCV
 - MediaPipe
-- ONNX
 - ONNX Runtime
 - NumPy
 
@@ -39,3 +38,7 @@ This project combines MediaPipe's FaceMesh for facial landmark detection and the
 - Depth estimation using the MiDaS model.
 - Eye center detection and distance calculation.
 - Visualization of depth map and landmark detection.
+
+## References
+[MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
+[MiDaS Model](https://pytorch.org/hub/intelisl_midas_v2/)
