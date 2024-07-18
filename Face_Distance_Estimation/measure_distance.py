@@ -8,6 +8,8 @@ import onnxruntime as ort
 LEFT_EYE_INDICES = [33, 133]
 RIGHT_EYE_INDICES = [362, 263]
 
+mean_distance = 0
+
 # Initialize MediaPipe FaceMesh and Drawing utilities
 mp_face_mesh = mp.solutions.face_mesh
 mp_drawing = mp.solutions.drawing_utils
@@ -33,11 +35,15 @@ def preprocess(image):
 
 # Function to process and display face landmarks on webcam input
 def process_webcam():
+    global mean_distance
+    
     cap = cv2.VideoCapture(0)
     with mp_face_mesh.FaceMesh(
         max_num_faces=1,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5) as face_mesh:
+        
+        distance_list = []
         
         while cap.isOpened():
             success, frame = cap.read()
@@ -64,6 +70,18 @@ def process_webcam():
             # Draw the eye landmarks and the line between them
             if results.multi_face_landmarks:
                 for face_landmarks in results.multi_face_landmarks:
+                    # Get bounding box for the face
+                    landmarks = face_landmarks.landmark
+                    img_h, img_w, _ = img_bgr.shape
+                    bbox_x_min = min([int(landmark.x * img_w) for landmark in landmarks])
+                    bbox_x_max = max([int(landmark.x * img_w) for landmark in landmarks])
+                    bbox_y_min = min([int(landmark.y * img_h) for landmark in landmarks])
+                    bbox_y_max = max([int(landmark.y * img_h) for landmark in landmarks])
+
+                    # Draw bounding box and put label
+                    cv2.rectangle(img_bgr, (bbox_x_min, bbox_y_min), (bbox_x_max, bbox_y_max), (0, 255, 0), 2)
+                    cv2.putText(img_bgr, f'Face', (bbox_x_min, bbox_y_min-5),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
                     
                     # Extract the coordinates of the eye landmarks
                     left_eye_coords = get_eye_center(face_landmarks.landmark, LEFT_EYE_INDICES, img_bgr.shape)
@@ -76,13 +94,6 @@ def process_webcam():
                     # Draw a line between the eye landmarks
                     cv2.line(img_bgr, left_eye_coords, right_eye_coords, (0, 255, 0), 2)
 
-                    # Calculate the number of pixels between the eye landmarks
-                    x_coordinates = (left_eye_coords[0] - right_eye_coords[0]) ** 2
-                    y_coordinates = (left_eye_coords[1] - right_eye_coords[1]) ** 2
-                    num_pixels = math.sqrt(x_coordinates + y_coordinates)
-
-                    cv2.putText(img_bgr, f'{int(num_pixels)} pixels', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
                     # Calculate the center point between the eye landmarks
                     center_coords = ((left_eye_coords[0] + right_eye_coords[0]) // 2, 
                                      (left_eye_coords[1] + right_eye_coords[1]) // 2)
@@ -93,12 +104,20 @@ def process_webcam():
                     cv2.circle(img_bgr, center_coords, 5, (255, 0, 0), -1)
                     cv2.putText(img_bgr, f'Depth: {depth_value}', (center_coords[0] + 10, center_coords[1] - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
-                    
-                    distance = (6.5 * depth_value) / num_pixels
-                    distance = round(distance * 3, 2)   # Tune the value
 
-                    cv2.putText(img_bgr, f'Distance: {distance} cm', (50, 80),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                    distance = (depth_value / 10) + 4
+
+                    distance_list.append(distance)
+                    
+                    if len(distance_list) == 10:
+                        mean_distance = np.mean(distance_list)
+                        distance_list = []
+
+                    cv2.putText(img_bgr, f'Mean Distance: {mean_distance:.2f} cm', (50, 20),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(img_bgr, f'Distance: {distance} cm', (50, 40),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+
 
             cv2.imshow('MediaPipe Face Mesh', img_bgr)
             cv2.imshow('Depth Map', depth_map_colored)
