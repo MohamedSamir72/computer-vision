@@ -35,7 +35,7 @@ This project combines MediaPipe's FaceMesh for facial landmark detection and the
     ```
 
 ## Features
-Real-time face landmark detection using MediaPipe.
-Depth estimation using the MiDaS model.
-Eye center detection and distance calculation.
-Visualization of depth map and landmark detection.
+- Real-time face landmark detection using MediaPipe.
+- Depth estimation using the MiDaS model.
+- Eye center detection and distance calculation.
+- Visualization of depth map and landmark detection.
