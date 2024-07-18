@@ -34,13 +34,8 @@ This project combines MediaPipe's FaceMesh for facial landmark detection and the
     python depth_estimation.py
     ```
 
-## Code Explanation
-
-### Import Libraries
-
-```python
-import cv2
-import mediapipe as mp
-import numpy as np
-import math
-import onnxruntime as ort
+## Features
+Real-time face landmark detection using MediaPipe.
+Depth estimation using the MiDaS model.
+Eye center detection and distance calculation.
+Visualization of depth map and landmark detection.
