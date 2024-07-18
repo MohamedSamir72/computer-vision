@@ -1,4 +1,4 @@
-# Depth Estimation and Eye Distance Measurement
+# Depth Estimation and Face Distance Measurement
 
 This project combines MediaPipe's FaceMesh for facial landmark detection and the MiDaS model for depth estimation using ONNX runtime. It captures webcam input, detects eye landmarks, estimates depth, and calculates the distance between the eyes.
 
