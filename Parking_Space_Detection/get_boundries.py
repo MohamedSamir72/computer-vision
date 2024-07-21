@@ -4,7 +4,7 @@ import pandas as pd
 name_window = "Image"
 points = []
 width = 135
-height = 60
+height = 58
 spaces = 7
 
 
