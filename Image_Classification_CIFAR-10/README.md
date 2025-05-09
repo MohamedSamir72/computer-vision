@@ -1,6 +1,6 @@
-#Image Classification with CIFAR-10
+*Image Classification with CIFAR-10*
 
-## Tools:
-### NumPy
-### matplotlib
-### PyTorch
+Tools:
+NumPy
+matplotlib
+PyTorch
