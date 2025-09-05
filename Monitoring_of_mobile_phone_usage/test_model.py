@@ -2,7 +2,7 @@ from ultralytics import RTDETR
 import cv2
 
 # Load pretrained RT-DETR model
-model = RTDETR("best_1.pt")
+model = RTDETR("models/best.pt")
 
 # Run inference in streaming mode (frame by frame)
 results = model.predict(source="videos/1.mp4", stream=True, show=False, conf=0.30)
