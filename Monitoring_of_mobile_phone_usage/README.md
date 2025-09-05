@@ -1,4 +1,4 @@
-# 📱 Phone Use Detection in Workplace  
+<img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/27638df8-8988-4cdf-b29c-b65984b2afef" /># 📱 Phone Use Detection in Workplace  
 
 This project detects people who use mobile phones during work. It combines **Grounding DINO-tiny** for automatic annotation and **RT-DETR** for object detection, providing a full workflow from dataset preparation to deployment.  
 
@@ -31,6 +31,56 @@ Here’s an example of detection (`Person+Phone` highlighted in red):
 
 ### 1️⃣ Clone Repository & Install Requirements
 ```bash
-git clone https://github.com/your-repo/phone-detection.git
-cd phone-detection
+git clone --filter=blob:none --sparse https://github.com/MohamedSamir72/computer-vision.git
+cd computer-vision
+git sparse-checkout set Monitoring_of_mobile_phone_usage
+```
+
+### 2️⃣ Download Models & Videos
+Download the required models and sample videos from Google Drive:
+![📂 Download Here](https://drive.google.com/drive/folders/11BeVX8V-LWUuIsmbbhLod77uvQVuGbU2)
+Place them inside the project directory like this:
+```bash
+Monitoring_of_mobile_phone_usage/
+│── models/       # Trained models (best.pt, model.onnx)
+│── videos/       # Test videos
+```
+
+### 3️⃣ Install Requirements
+```bash
 pip install -r requirements.txt
+```
+
+### 4️⃣ Run Detection on Video
+```bash
+python detect_phone.py --source videos/1.mp4
+```
+
+### 5️ Run Live Detection (Webcam)
+```bash
+python detect_phone.py --source 0
+```
+
+### 6️⃣ Run with Optimized Model (ONNX) [Optional]
+```bash
+python detect_phone.py --model models/best.onnx
+```
+
+---
+
+## 📂 Project Structure
+```bash
+Monitoring_of_mobile_phone_usage/
+│── models/
+│   ├── best.pt              # Trained RT-DETR model
+│   └── best.onnx            # Optimized ONNX model
+│
+│── videos/                  # Test videos
+│── generate_annotations.py  # Generate annotations
+│── generate_dataset.py      # Generate dataset from videos
+│── main.py                  # Detection script
+│── test_model.py            # Test deafult model
+│── test_quantized_model.py  # Test optimized model
+│── requirements.txt         # Dependencies
+└── README.md                # Project documentation
+```
