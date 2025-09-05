@@ -1,4 +1,4 @@
-<img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/27638df8-8988-4cdf-b29c-b65984b2afef" /># 📱 Phone Use Detection in Workplace  
+# 📱 Phone Use Detection in Workplace  
 
 This project detects people who use mobile phones during work. It combines **Grounding DINO-tiny** for automatic annotation and **RT-DETR** for object detection, providing a full workflow from dataset preparation to deployment.  
 
