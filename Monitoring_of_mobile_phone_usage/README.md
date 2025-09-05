@@ -8,7 +8,7 @@ This project detects people who use mobile phones during work. It combines **Gro
 - ✅ Automatic annotation with **Grounding DINO-tiny** (zero-shot labeling).  
 - ✅ Training and inference with **RT-DETR**.  
 - ✅ Real-time detection from **video files** or **live camera feeds**.  
-- ✅ Model optimization: converted trained model to **ONNX (`vest.onnx`)** for faster and portable inference. 
+- ✅ Model optimization: converted trained model to **ONNX (`best.onnx`)** for faster and portable inference. 
 
 ---
 
