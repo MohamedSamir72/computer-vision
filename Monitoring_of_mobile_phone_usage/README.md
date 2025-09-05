@@ -38,7 +38,7 @@ git sparse-checkout set Monitoring_of_mobile_phone_usage
 
 ### 2️⃣ Download Models & Videos
 Download the required models and sample videos from Google Drive:
-![📂 Download Here](https://drive.google.com/drive/folders/11BeVX8V-LWUuIsmbbhLod77uvQVuGbU2)
+[📂 Download Here]([https://drive.google.com/drive/folders/11BeVX8V-LWUuIsmbbhLod77uvQVuGbU2](https://drive.google.com/drive/folders/11BeVX8V-LWUuIsmbbhLod77uvQVuGbU2?usp=sharing))
 Place them inside the project directory like this:
 ```bash
 Monitoring_of_mobile_phone_usage/
