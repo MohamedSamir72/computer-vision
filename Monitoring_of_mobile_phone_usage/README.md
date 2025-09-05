@@ -53,17 +53,17 @@ pip install -r requirements.txt
 
 ### 4️⃣ Run Detection on Video
 ```bash
-python detect_phone.py --source videos/1.mp4
+python main.py --source videos/1.mp4
 ```
 
 ### 5️ Run Live Detection (Webcam)
 ```bash
-python detect_phone.py --source 0
+python main.py --source 0
 ```
 
 ### 6️⃣ Run with Optimized Model (ONNX) [Optional]
 ```bash
-python detect_phone.py --model models/best.onnx
+python main.py --model models/best.onnx
 ```
 
 ---
