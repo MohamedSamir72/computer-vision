@@ -1,70 +1,99 @@
 import torch
-import numpy as np
 
-def claculate_iou(box_pred, box_target):
+class BoundingBox:
     """
-    Calculate Intersection over Union (IoU) between two bounding boxes.
-
-    Args:
-        box1 (torch.Tensor): Bounding box 1 of shape (4,) in format [x1, y1, x2, y2].
-        box2 (torch.Tensor): Bounding box 2 of shape (4,) in format [x1, y1, x2, y2].
-
-    Returns:
-        float: IoU value.
-    """
-    ### Calculate intersection coordinates
-    x1 = torch.max(box_pred[0], box_target[0])
-    y1 = torch.max(box_pred[1], box_target[1])
-    x2 = torch.min(box_pred[2], box_target[2])
-    y2 = torch.min(box_pred[3], box_target[3])
-
-    ### To ensure the only positive values are considered for intersection area
-    intersection_area: int = (x2 - x1).clamp(0) * (y2 - y1).clamp(0)
-    # print(f"Intersection: {intersection_area}")
-
-    pred_area: int = (box_pred[2] - box_pred[0]) * (box_pred[3] - box_pred[1])
-    target_area: int = (box_target[2] - box_target[0]) * (box_target[3] - box_target[1])
-    union_area: int = pred_area + target_area - intersection_area
-    # print(f"Union: {union_area}")
-
-    iou: float = intersection_area / union_area 
-    
-    return iou.item()
-
-def intersection_over_union(pred_box: torch.Tensor, 
-                            target_box: torch.Tensor, 
-                            threshold: float = 0.5, 
-                            box_format: str = "midpoint"):
-    """
-    Initialize with two sets of bounding boxes and a threshold.
-    predicitions & targets shape: [x1, y1, x2, y2, conf, class1, class2, ...]
-
-    Args:
-        pred_box (torch.Tensor): Predicted bounding box.
-        target_box (torch.Tensor): Ground truth bounding box.
-        threshold (float): IoU threshold to consider a match.
+    A class to represent a bounding box and perform IoU calculations.
     """
 
-    if box_format == "midpoint":
-        pred_box = [pred_box[0] - pred_box[2] / 2,
-                    pred_box[1] - pred_box[3] / 2,
-                    pred_box[0] + pred_box[2] / 2,
-                    pred_box[1] + pred_box[3] / 2]
-        
-        target_box = [target_box[0] - target_box[2] / 2,
-                    target_box[1] - target_box[3] / 2,
-                    target_box[0] + target_box[2] / 2,
-                    target_box[1] + target_box[3] / 2]
-        
-        return claculate_iou(pred_box, target_box)
+    def __init__(self, coordinates: torch.Tensor, box_format: str = "midpoint"):
+        """
+        Initializes a BoundingBox object.
 
-    elif box_format == "corner":
-        return claculate_iou(pred_box, target_box)
-    
+        Args:
+            coordinates (torch.Tensor): Bounding box coordinates of shape (4,) or (6,).
+            box_format (str): The format of the bounding box, either "midpoint" or "corner".
+        """
+        self.box_format = box_format
+        self.coordinates = coordinates
+
+        if self.box_format == "midpoint":
+            # Convert from midpoint to corner format if necessary
+            self.to_corner_format()
+
+    def to_corner_format(self):
+        """Converts from midpoint format to corner format (x1, y1, x2, y2)."""
+        self.x1 = self.coordinates[0] - self.coordinates[2] / 2
+        self.y1 = self.coordinates[1] - self.coordinates[3] / 2
+        self.x2 = self.coordinates[0] + self.coordinates[2] / 2
+        self.y2 = self.coordinates[1] + self.coordinates[3] / 2
+        self.corner_coordinates = torch.tensor([self.x1, self.y1, self.x2, self.y2])
+
+    def calculate_iou(self, other_box: "BoundingBox") -> float:
+        """
+        Calculates the Intersection over Union (IoU) between the current box and another bounding box.
+
+        Args:
+            other_box (BoundingBox): The second bounding box to compare with.
+
+        Returns:
+            float: IoU value between 0 and 1.
+        """
+        x1 = torch.max(self.corner_coordinates[0], other_box.corner_coordinates[0])
+        y1 = torch.max(self.corner_coordinates[1], other_box.corner_coordinates[1])
+        x2 = torch.min(self.corner_coordinates[2], other_box.corner_coordinates[2])
+        y2 = torch.min(self.corner_coordinates[3], other_box.corner_coordinates[3])
+
+        # Calculate intersection area (clamping to ensure positive area)
+        intersection_area = (x2 - x1).clamp(0) * (y2 - y1).clamp(0)
+
+        # Calculate areas of both boxes
+        pred_area = (self.corner_coordinates[2] - self.corner_coordinates[0]) * (self.corner_coordinates[3] - self.corner_coordinates[1])
+        target_area = (other_box.corner_coordinates[2] - other_box.corner_coordinates[0]) * (other_box.corner_coordinates[3] - other_box.corner_coordinates[1])
+
+        # Calculate union area
+        union_area = pred_area + target_area - intersection_area
+
+        # Calculate IoU
+        iou = intersection_area / union_area
+        return iou.item()
+
+class IoUCalculator:
+    """
+    A class to perform the IoU calculation between a list of predicted boxes and target boxes.
+    """
+
+    @staticmethod
+    def intersection_over_union(pred_box: torch.Tensor, 
+                                target_box: torch.Tensor, 
+                                threshold: float = 0.5, 
+                                box_format: str = "midpoint") -> float:
+        """
+        Calculates the IoU for a single pair of predicted and target boxes.
+
+        Args:
+            pred_box (torch.Tensor): The predicted bounding box.
+            target_box (torch.Tensor): The ground truth bounding box.
+            threshold (float): IoU threshold to consider a match (default is 0.5).
+            box_format (str): Format of the bounding boxes ("midpoint" or "corner").
+
+        Returns:
+            float: IoU value between 0 and 1.
+        """
+        pred_bbox = BoundingBox(pred_box, box_format=box_format)
+        target_bbox = BoundingBox(target_box, box_format=box_format)
+
+        iou = pred_bbox.calculate_iou(target_bbox)
+
+        if iou >= threshold:
+            return iou
+        else:
+            return 0.0  # Return 0 if IoU is below the threshold
+
+# Example usage
 if __name__ == "__main__":
-    # Each row: [x_min, y_min, x_max, y_max, conf, class1, class2, ...]
-    predictions = torch.tensor([20, 30, 50, 70, 0.9, 0.1, 0.9])
+    predictions = torch.tensor([20, 30, 50, 70, 0.9, 0.1, 0.9])  # [x1, y1, x2, y2, conf, class1, class2, ...]
+    targets = torch.tensor([25, 40, 50, 70, 1.0, 0, 1])  # [x1, y1, x2, y2, conf, class1, class2, ...]
 
-    targets = torch.tensor([25, 40, 50, 70, 1.0, 0, 1])
-
-    print(intersection_over_union(predictions, targets, box_format="midpoint"))
+    # IoU calculation
+    iou_value = IoUCalculator.intersection_over_union(predictions, targets, box_format="midpoint")
+    print(f"IoU Value: {iou_value}")
