@@ -1,17 +1,20 @@
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 from config import Config
-
 import os
 
 def get_dataloaders():
     ### Data transformations
     train_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
     val_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
