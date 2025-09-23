@@ -1,18 +1,14 @@
 import torch
 from torch import nn
-import torch.optim as optim
+from torch.optim import Adam
 from model import ViT
 from config import Config
 from dataset import get_dataloaders
-from tqdm import tqdm
 
-print("starting training...")
 def train():
-    print("getting data loaders...")
     # Get data loaders
     train_dataloader, val_dataloader = get_dataloaders()
 
-    print("training...")
     # Initialize model, loss function, optimizer
     model = ViT(
         in_ch=Config.CHANNELS,
@@ -27,11 +23,10 @@ def train():
     ).to(Config.DEVICE)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=Config.LEARNING_RATE)
+    optimizer = Adam(model.parameters(), lr=Config.LEARNING_RATE)
 
-    print("starting training loop...")
     # Training loop
-    for epoch in tqdm(range(Config.NUM_EPOCHS)):
+    for epoch in range(Config.NUM_EPOCHS):
         model.train()
         running_loss = 0.0
         for images, labels in train_dataloader:
@@ -51,8 +46,6 @@ def train():
     torch.save(model.state_dict(), f"{Config.SAVE_PATH}/vit_model.pth")
     print("Model saved!")
 
-
-print("ending training...")
 
 if __name__ == "__main__":
     train()
