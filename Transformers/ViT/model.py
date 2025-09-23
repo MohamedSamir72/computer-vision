@@ -8,7 +8,7 @@ class Embedded_Patches(nn.Module):
         super().__init__()
         num_patches = (img_size // patch_size) ** 2
 
-        self.proj = nn.Conv2d(in_ch, emb_size, Kernel_size=patch_size, stride=patch_size)
+        self.proj = nn.Conv2d(in_ch, emb_size, kernel_size=patch_size, stride=patch_size)
         self.cls_token = nn.Parameter(torch.randn(1, 1, emb_size))
         self.pos_embed = nn.Parameter(torch.randn((1, 1+num_patches, emb_size)))
 
@@ -86,8 +86,3 @@ class ViT(nn.Module):
         x = self.head(cls_token_final)  # (B, num_classes)
         return x
 
-class Postional_Embedding(nn.Module):
-    pass
-
-class Transformer_Decoder(nn.Module):
-    pass
