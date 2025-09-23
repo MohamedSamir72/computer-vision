@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import torch
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     LEARNING_RATE: float = 0.001
     DROP_OUT: float = 0.1
