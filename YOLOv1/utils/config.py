@@ -1,13 +1,33 @@
 from dataclasses import dataclass
 import torch
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     """
     Configuration settings
     """
-    device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
-    batch_size: int = 4
-    epochs: int = 100
-    learning_rate: float = 0.001
+    DEVICE: str = 'cuda' if torch.cuda.is_available() else 'cpu'
+    LEARNING_RATE: float = 0.001
+    BATCH_SIZE: int = 4
+    NUM_EPOCHS: int = 100
+    ARCHITECTURE = [
+        (7, 64, 2, 3),
+        "MaxPool",
+        (3, 192, 1, 1),
+        "MaxPool",
+        (1, 128, 1, 0),
+        (3, 256, 1, 1),
+        (1, 256, 1, 0),
+        (3, 512, 1, 1),
+        "MaxPool",
+        [(1, 256, 1, 0), (3, 512, 1, 1), 4],
+        (1, 512, 1, 0),
+        (3, 1024, 1, 1),
+        "MaxPool",
+        [(1, 512, 1, 0), (3, 1024, 1, 1), 2],
+        (3, 1024, 1, 1),
+        (3, 1024, 2, 1),
+        (3, 1024, 1, 1),
+        (3, 1024, 1, 1)
+    ]
     
