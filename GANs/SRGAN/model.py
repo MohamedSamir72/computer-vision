@@ -61,19 +61,19 @@ class Discriminator(nn.Module):
 
         self.conv_blocks = []
         for _ in range(3):
-            self.conv_blocks.append(ConvBlock(out_ch, out_ch*2, kernel_size=3, stride=2, padding=1, act_type='leaky_relu'))
-            self.conv_blocks.append(ConvBlock(out_ch*2, out_ch*2, kernel_size=3, stride=1, padding=1, act_type='leaky_relu'))
+            self.conv_blocks.append(ConvBlock(out_ch, out_ch*2, kernel_size=3, stride=1, padding=1, act_type='leaky_relu'))
+            self.conv_blocks.append(ConvBlock(out_ch*2, out_ch*2, kernel_size=3, stride=2, padding=1, act_type='leaky_relu'))
 
             out_ch *= 2
 
         self.conv_blocks = nn.Sequential(*self.conv_blocks)
 
         # Dimensionality reduction to be suitable with different input sizes (images)
-        self.gap = nn.AdaptiveAvgPool2d((1, 1)) 
+        self.gap = nn.AdaptiveAvgPool2d((3, 3)) 
 
         self.final = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(out_ch, 1024),
+            nn.Linear(out_ch*3*3, 1024),
             nn.LeakyReLU(0.2),
             nn.Linear(1024, 1)
         )
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     Test the Generator and Discriminator models
     """    
     
-    x = torch.randn((1, 3, 48, 48))
+    x = torch.randn((1, 3, 24, 24))
 
     model = Generator()
     out = model(x)
