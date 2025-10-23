@@ -1,7 +1,9 @@
-from torchvision import datasets, transforms
+from torchvision import transforms
+from torch.utils.data import Dataset
 
-class Map_Dataset(datasets):
+class Map_Dataset(Dataset):
     def __init__(self, data, labels):
+        super().__init__()
         self.data = data
         self.labels = labels
         self.transform = transforms.Compose([
@@ -19,3 +21,4 @@ class Map_Dataset(datasets):
             sample = self.transform(sample)
 
         return sample, label
+    
