@@ -39,8 +39,7 @@ class Conv_VAE(nn.Module):
 
         # Decoder Block
         self.decoder = nn.Sequential(
-            ConvBlock(in_channels=latent_channels, out_channels=32, kernel_size=3, stride=1, padding=1, transpose=True),
-            ConvBlock(in_channels=32, out_channels=16, kernel_size=3, stride=2, padding=1, transpose=True),
+            ConvBlock(in_channels=latent_channels, out_channels=16, kernel_size=3, stride=2, padding=1, transpose=True),
             ConvBlock(in_channels=16, out_channels=8, kernel_size=3, stride=2, padding=1, transpose=True),
             nn.ConvTranspose2d(in_channels=8, out_channels=in_ch, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.Sigmoid()
@@ -66,13 +65,17 @@ class Conv_VAE(nn.Module):
 
         return z, mu, logvar
 
+    def forward_decoder(self, x):
+        return self.decoder(x)
 
     def forward(self, x):
         z, mu, logvar = self.forward_encoder(x)
-        print("Latent z shape:", z.shape)
-        print("Latent mu shape:", mu.shape)
-        print("Latent logvar shape:", logvar.shape)
-        
+        # print("Latent z shape:", z.shape)
+
+        x_recon = self.forward_decoder(z)
+        # print("Reconstructed x shape:", x_recon.shape)
+        return x_recon, mu, logvar
+
 
 if __name__ == "__main__":
     model = Conv_VAE()
