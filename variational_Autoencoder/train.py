@@ -6,13 +6,17 @@ from config import Config
 from model import Conv_VAE
 from dataset import Map_Dataset
 
-def VAE_loss(recon_x, x, mu, logvar):
+def VAE_loss(recon_x, x, mu, logvar, reconstruction_loss_weight, kld_loss_weight):
     # Reconstruction loss
-    MSE = nn.MSELoss(reduction='sum')(recon_x, x)
-
+    mse = (recon_x - x) ** 2
+    mse = mse.flatten(1).sum(dim=1)
+    mse = mse.mean().item()
+    
     # KL Divergence
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    return MSE + KLD
+    kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - torch.exp(logvar), dim=1)
+    kl_divergence = kl_divergence.mean().item()
+
+    return (reconstruction_loss_weight * mse) + (kld_loss_weight * kl_divergence)
 
 def train():
     # Load Configurations
@@ -46,4 +50,16 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    # train()
+    # handle random seed for reproducibility
+    torch.manual_seed(0)
+
+    x = torch.randn((4, 1, 28, 28))
+    x_hat = torch.randn((4, 1, 28, 28))
+    mu = torch.randn((4, 2))
+    logvar = torch.randn((4, 2))
+
+    loss = VAE_loss(x_hat, x, mu, logvar,
+                    Config.RECONSTRUCTION_LOSS_WEIGHT,
+                    Config.KLD_LOSS_WEIGHT)
+    # print("Loss:", loss.item())
