@@ -126,17 +126,3 @@ if __name__ == "__main__":
         reconstruction_loss_weight=Config.RECONSTRUCTION_LOSS_WEIGHT,
         kld_loss_weight=Config.KLD_LOSS_WEIGHT
     )
-
-
-    # # handle random seed for reproducibility
-    # torch.manual_seed(0)
-
-    # x = torch.randn((4, 1, 28, 28))
-    # x_hat = torch.randn((4, 1, 28, 28))
-    # mu = torch.randn((4, 2))
-    # logvar = torch.randn((4, 2))
-
-    # loss = VAE_loss(x_hat, x, mu, logvar,
-    #                 Config.RECONSTRUCTION_LOSS_WEIGHT,
-    #                 Config.KLD_LOSS_WEIGHT)
-    # # print("Loss:", loss)
