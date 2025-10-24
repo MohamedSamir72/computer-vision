@@ -5,20 +5,11 @@ from torchvision.datasets import MNIST
 from config import Config
 from model import Conv_VAE
 from dataset import Map_Dataset
+from loss import VAE_loss
+
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 import os
-
-def VAE_loss(recon_x, x, mu, logvar, reconstruction_loss_weight=1.0, kld_loss_weight=1.0):
-    # Reconstruction loss
-    mse = (recon_x - x) ** 2
-    mse = mse.flatten(1).sum(dim=1)
-    mse = mse.mean()
-    
-    # KL Divergence
-    kl_divergence = -0.5 * torch.sum(1 + logvar - mu.pow(2) - torch.exp(logvar), dim=1)
-    kl_divergence = kl_divergence.mean()
-
-    return (reconstruction_loss_weight * mse) + (kld_loss_weight * kl_divergence)
 
 def train(
         model, 
@@ -37,7 +28,7 @@ def train(
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
     
     # Loss tracking
     train_losses, eval_losses = [], []
@@ -57,8 +48,14 @@ def train(
 
             x_recon, mu, logvar = model(images)
 
-            loss = VAE_loss(x_recon, images, mu, logvar,
-                            reconstruction_loss_weight, kld_loss_weight)
+            loss = VAE_loss(
+                x_recon, 
+                images, 
+                mu, 
+                logvar, 
+                reconstruction_loss_weight=reconstruction_loss_weight, 
+                kld_loss_weight=kld_loss_weight,
+                perceptual_loss_act=True)
 
             # Backpropagation
             optimizer.zero_grad()
@@ -82,8 +79,15 @@ def train(
                 images = images.to(device)
                 x_recon, mu, logvar = model(images)
 
-                loss = VAE_loss(x_recon, images, mu, logvar,
-                                reconstruction_loss_weight, kld_loss_weight)
+                loss = VAE_loss(
+                    x_recon, 
+                    images, 
+                    mu, 
+                    logvar, 
+                    reconstruction_loss_weight=reconstruction_loss_weight, 
+                    kld_loss_weight=kld_loss_weight,
+                    perceptual_loss_act=True)
+                
                 running_eval_loss += loss.item() * images.size(0)
 
         # Average eval loss
@@ -102,11 +106,20 @@ def train(
             torch.save(model.state_dict(), save_path)
             print(f"Saved new best model at epoch {epoch} (Eval Loss: {best_eval_loss:.6f})")
 
-    print("Training complete.")
+    print("\nTraining complete.")
     print(f"Best model saved to: {os.path.abspath(save_path)}")
+    
+    # Plot training and evaluation loss
+    plt.figure(figsize=(10,5))
+    plt.plot(range(1, epochs + 1), train_losses, label='Train Loss')
+    plt.plot(range(1, epochs + 1), eval_losses, label='Eval Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Training and Evaluation Loss over Epochs')
+    plt.legend()
+    plt.show()
+
     return train_losses, eval_losses
-
-
 
 if __name__ == "__main__":
     train_data = MNIST(root='./data', train=True, download=True)
@@ -115,6 +128,7 @@ if __name__ == "__main__":
     test_dataset = Map_Dataset(data=test_data.data, labels=test_data.targets)
 
     model = Conv_VAE()
+
     train(
         model=model,
         device=Config.DEVICE,
