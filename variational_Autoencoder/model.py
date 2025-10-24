@@ -8,7 +8,7 @@ class ConvBlock(nn.Module):
             nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=False) if not transpose 
             else nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding, output_padding=1),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU()
+            nn.LeakyReLU()
         )
 
     def forward(self, x):
