@@ -2,6 +2,7 @@
 
 A PyTorch implementation of a **Variational Autoencoder (VAE)** for image reconstruction and latent space learning.  
 This project is part of the [Computer Vision](https://github.com/MohamedSamir72/computer-vision) repository.
+
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?logo=pytorch&logoColor=white)
 ![CUDA](https://img.shields.io/badge/CUDA-Enabled-green)
