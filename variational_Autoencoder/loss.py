@@ -9,7 +9,9 @@ def get_features(x, model, layers):
             features.append(x)
     return features
 
-def VAE_loss(x_recon, x, mu, logvar, reconstruction_loss_weight=1.0, kld_loss_weight=1.0,
+def VAE_loss(x_recon, x, mu, logvar, 
+             reconstruction_loss_weight=1.0, 
+             kld_loss_weight=1.0,
              perceptual_loss_act=False):
     """
     Reconstruction loss
@@ -26,14 +28,15 @@ def VAE_loss(x_recon, x, mu, logvar, reconstruction_loss_weight=1.0, kld_loss_we
     Perceptual Loss
     """
     # Load pre-trained VGG16 model for perceptual loss
-    vgg_model = vgg16(weights=VGG16_Weights.DEFAULT).features.eval().to(x.device)
+    if perceptual_loss_act:
+        vgg_model = vgg16(weights=VGG16_Weights.DEFAULT).features.eval().to(x.device)
 
     # Freeze VGG parameters
     for param in vgg_model.parameters():
         param.requires_grad = False
 
     perceptual_loss = 0
-    if perceptual_loss_act and vgg_model is not None:
+    if vgg_model is not None:
         # Get the device of the VGG model
         vgg_device = next(vgg_model.parameters()).device
 
@@ -73,10 +76,12 @@ def VAE_loss(x_recon, x, mu, logvar, reconstruction_loss_weight=1.0, kld_loss_we
     return (reconstruction_loss_weight * mse) + (kld_loss_weight * kl_divergence) + perceptual_loss
 
 if __name__ == "__main__":
+    # Simple test
     x = torch.randn((4, 1, 28, 28))
     recon_x = torch.randn((4, 1, 28, 28))
     mu = torch.randn((4, 4))
     logvar = torch.randn((4, 4))
+    
     print("Testing VAE loss function...")
     loss = VAE_loss(recon_x, x, mu, logvar, perceptual_loss_act=True)
     print(f"VAE Loss: {loss.item()}")
