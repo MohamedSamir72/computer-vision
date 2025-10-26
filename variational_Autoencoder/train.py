@@ -21,6 +21,7 @@ def train(
         epochs,
         reconstruction_loss_weight,
         kld_loss_weight,
+        use_perceptual_loss=False,
         save_path="best_model.pth"):
 
     model.to(device)
@@ -55,7 +56,7 @@ def train(
                 logvar, 
                 reconstruction_loss_weight=reconstruction_loss_weight, 
                 kld_loss_weight=kld_loss_weight,
-                perceptual_loss_act=True)
+                perceptual_loss_act=use_perceptual_loss)
 
             # Backpropagation
             optimizer.zero_grad()
@@ -86,7 +87,7 @@ def train(
                     logvar, 
                     reconstruction_loss_weight=reconstruction_loss_weight, 
                     kld_loss_weight=kld_loss_weight,
-                    perceptual_loss_act=True)
+                    perceptual_loss_act=use_perceptual_loss)
                 
                 running_eval_loss += loss.item() * images.size(0)
 
@@ -138,5 +139,6 @@ if __name__ == "__main__":
         learning_rate=Config.LEARNING_RATE,
         epochs=Config.EPOCHS,
         reconstruction_loss_weight=Config.RECONSTRUCTION_LOSS_WEIGHT,
-        kld_loss_weight=Config.KLD_LOSS_WEIGHT
+        kld_loss_weight=Config.KLD_LOSS_WEIGHT,
+        use_perceptual_loss=False
     )
