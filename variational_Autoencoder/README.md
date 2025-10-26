@@ -25,9 +25,9 @@ variational_Autoencoder/
 │
 ├── model.py # Defines VAE architecture
 ├── train.py # Training loop and loss computation
-├── utils.py # Helper functions (plotting, saving, etc.)
+├── loss.py # Loss function 
+├── config.py # All configurations for the model
 ├── dataset.py # Dataset loading and preprocessing
-├── results/ # Saved models, losses, and reconstructions
 ├── README.md # Project documentation
 └── requirements.txt # Python dependencies
 ```
@@ -64,3 +64,8 @@ L = α × Reconstruction Loss + β × KL Divergence
 RECONSTRUCTION_LOSS_WEIGHT: float = 1.0
 KLD_LOSS_WEIGHT: float = 1.0
 ```
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
