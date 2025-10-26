@@ -27,6 +27,8 @@ def VAE_loss(x_recon, x, mu, logvar,
     """
     Perceptual Loss
     """
+    perceptual_loss = 0
+
     # Load pre-trained VGG16 model for perceptual loss
     if perceptual_loss_act:
         vgg_model = vgg16(weights=VGG16_Weights.DEFAULT).features.eval().to(x.device)
@@ -35,42 +37,41 @@ def VAE_loss(x_recon, x, mu, logvar,
     for param in vgg_model.parameters():
         param.requires_grad = False
 
-    perceptual_loss = 0
-    if vgg_model is not None:
-        # Get the device of the VGG model
-        vgg_device = next(vgg_model.parameters()).device
+        if vgg_model is not None:
+            # Get the device of the VGG model
+            vgg_device = next(vgg_model.parameters()).device
 
-        # Convert grayscale to RGB if needed (VGG expects 3 channels)
-        if x.shape[1] == 1:
-            x_rgb = x.repeat(1, 3, 1, 1).to(vgg_device)
-            x_recon_rgb = x_recon.repeat(1, 3, 1, 1).to(vgg_device)
-        else:
-            x_rgb = x.to(vgg_device)
-            x_recon_rgb = x_recon.to(vgg_device)
+            # Convert grayscale to RGB if needed (VGG expects 3 channels)
+            if x.shape[1] == 1:
+                x_rgb = x.repeat(1, 3, 1, 1).to(vgg_device)
+                x_recon_rgb = x_recon.repeat(1, 3, 1, 1).to(vgg_device)
+            else:
+                x_rgb = x.to(vgg_device)
+                x_recon_rgb = x_recon.to(vgg_device)
 
-        # Resize images to at least 64x64 for VGG (28x28 is too small for deep layers)
-        if x_rgb.shape[-1] < 64 or x_rgb.shape[-2] < 64:
-            x_rgb = torch.nn.functional.interpolate(x_rgb, size=(64, 64), mode='bilinear', align_corners=False)
-            x_recon_rgb = torch.nn.functional.interpolate(x_recon_rgb, size=(64, 64), mode='bilinear', align_corners=False)
+            # Resize images to at least 64x64 for VGG (28x28 is too small for deep layers)
+            if x_rgb.shape[-1] < 64 or x_rgb.shape[-2] < 64:
+                x_rgb = torch.nn.functional.interpolate(x_rgb, size=(64, 64), mode='bilinear', align_corners=False)
+                x_recon_rgb = torch.nn.functional.interpolate(x_recon_rgb, size=(64, 64), mode='bilinear', align_corners=False)
 
-        # Normalize to ImageNet mean/std (VGG expects normalized inputs)
-        mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(vgg_device)
-        std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(vgg_device)
-        x_rgb = (x_rgb - mean) / std
-        x_recon_rgb = (x_recon_rgb - mean) / std
+            # Normalize to ImageNet mean/std (VGG expects normalized inputs)
+            mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(vgg_device)
+            std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(vgg_device)
+            x_rgb = (x_rgb - mean) / std
+            x_recon_rgb = (x_recon_rgb - mean) / std
 
-        # Define layers to extract features from (only early layers for small images)
-        # For 28x28 (upscaled to 64x64), use only early layers to avoid dimension issues
-        feature_layers = ['3', '8']  # relu1_2, relu2_2 (safer for small images)
+            # Define layers to extract features from (only early layers for small images)
+            # For 28x28 (upscaled to 64x64), use only early layers to avoid dimension issues
+            feature_layers = ['3', '8']  # relu1_2, relu2_2
 
-        # Extract features
-        with torch.no_grad():
-            target_features = get_features(x_rgb, vgg_model, feature_layers)
-        recon_features = get_features(x_recon_rgb, vgg_model, feature_layers)
+            # Extract features
+            with torch.no_grad():
+                target_features = get_features(x_rgb, vgg_model, feature_layers)
+            recon_features = get_features(x_recon_rgb, vgg_model, feature_layers)
 
-        # Compute perceptual loss as MSE between features
-        for target_feat, recon_feat in zip(target_features, recon_features):
-            perceptual_loss += torch.mean((target_feat - recon_feat) ** 2)
+            # Compute perceptual loss as MSE between features
+            for target_feat, recon_feat in zip(target_features, recon_features):
+                perceptual_loss += torch.mean((target_feat - recon_feat) ** 2)
 
 
     return (reconstruction_loss_weight * mse) + (kld_loss_weight * kl_divergence) + perceptual_loss
